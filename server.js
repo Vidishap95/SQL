@@ -127,17 +127,21 @@ const addRole = () => {
             type: 'list',
             message: 'What is the department that they belong?',
             name: 'deptList',
-            choices: res.map(
-                (dept) => dept.name
-            ),
+            choices: [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+            ]
         },
     ])
     .then((response) => {
-        const deptList = res.find(
-            (dept) => dept.name === response.deptList
-        );
         employeeTracker_db.query(`INSERT INTO role (title, salary, department_id)
-        VALUES('${response.newRole}', '${response.salary}', '${dept.id}')`,
+        VALUES('${response.newRole}', '${response.salary}', '${response.deptList}')`,
         (err, res) => {
             if (err) throw err;
             console.log('New role created!');
