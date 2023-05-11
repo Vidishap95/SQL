@@ -216,3 +216,27 @@ const addEmployee = () => {
     
 })
 }
+
+const updateEmployee = () => {
+    inquirer
+    .prompt ([
+        {
+            type: 'list',
+            message: 'Which employee you want to update?',
+            name: 'updateEmployee',
+            choices: resEmployee.map (
+                (viewAllEmployees) => `${viewAllEmployees.firstName} ${viewAllEmployees.lastName}`
+            ),
+        },
+        {
+            type: "list",
+            name: 'role',
+            message: "Select new role:",
+            choices: resRoles.map((role) => role.title),
+        }
+    ])
+    .then((response) => {
+        connectDB.query(`UPDATE employee SET ('${response.updateEmployee}')
+        WHERE(${response.newRole})
+    })
+}
