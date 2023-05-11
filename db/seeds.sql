@@ -20,7 +20,7 @@ VALUES
 ('Senior Engineer', 150000, 7),
 ('IT Head',175000, 8);
 
-INSERT INTO employee (first_name, last_name, role_id, manager_id)
+INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
 ('Sophia', 'Tunner', 1 , 1),
 ('Tom', 'Cruz', 2,2),

@@ -10,7 +10,7 @@ const employeeTracker_db = mysql.createConnection(
         database:'employeeTracker_db',
         password: '',
     },
-    console.log('Connected to databaase')
+    // console.log('Connected to database')
 );
 
 //options 
@@ -23,37 +23,37 @@ const question = () => {
         name: 'menuOptions',
         choices: [
             "View all Employees",
-            "View all Department",
+            "View all Departments",
             "View all Roles",
             "Add a Department",
             "Add a Role",
-            "Add Employees",
+            "Add Employee",
             "Remove Employee",
             "Update Employee Role",
         ],
     },
   ])
   .then ((response) => {
-    switch (response.choices) {
-        case "View all departments":
+    switch (response.menuOptions) {
+        case "View all Departments":
             viewAllDepartments ();
             break;
-        case "view all roles":
+        case "View all Roles":
             viewAllRoles ();
             break;
-        case "View all employees":
+        case "View all Employees":
             viewAllEmployees ();
             break;
-        case "Add a department":
+        case "Add a Department":
             addDepartment ();
             break;
-        case "Add a role":
+        case "Add a Role":
             addRole ();
             break;
-        case "Add a Employee":
+        case "Add Employee":
             addEmployee();
             break;
-        case "Update employee":
+        case "Update Employee Role":
             updateEmployee();
             break;
         case "Remove Employee":
@@ -63,7 +63,7 @@ const question = () => {
  })
 }
 const viewAllDepartments = () => {
-    connectDB.query('SELECT * FROM department', (err,res) => {
+    employeeTracker_db.query('SELECT * FROM departments', (err,res) => {
         if (err) throw err;
         console.table
         (res); //shows department table from db ie employee_db
@@ -72,7 +72,7 @@ const viewAllDepartments = () => {
 };
 
 const viewAllEmployees = () => {
-    connectDB.query('SELECT * FROM employee', (err,res) => {
+    employeeTracker_db.query('SELECT * FROM employees', (err,res) => {
         if (err) throw err;
         console.table(res); //shows all employees from table employee_db
         question();
@@ -80,7 +80,7 @@ const viewAllEmployees = () => {
 };
 
 const viewAllRoles = () => {
-    connectDB.query('SELECT * FROM role', (err,res) => {
+    employeeTracker_db.query('SELECT * FROM roles', (err,res) => {
         if (err) throw err;
         console.table(res); //shows all roles table from db ie employee_db
         question();
@@ -97,7 +97,7 @@ const addDepartment = () => {
         },
     ])
     .then((response) => {
-        connectDB.query(`INSERT INTO department (name)
+        employeeTracker_db.query(`INSERT INTO departments (name)
         VALUES('${response.newDepartment}')`,
         (err,  res) => {
             if(err) throw err;
@@ -108,10 +108,9 @@ const addDepartment = () => {
 }
 
 const addRole = () => {
-    const query = "SELECT * FROM departments";
-    connectDB.query(query, (err,res) => {
+    employeeTracker_db.query ("SELECT * FROM departments", (err, res) => {
         if (err) throw err;
-    })
+
     inquirer 
     .prompt([
         {
@@ -129,44 +128,50 @@ const addRole = () => {
             message: 'What is the department that they belong?',
             name: 'deptList',
             choices: res.map(
-                (deptList) => deptList.department_name
+                (dept) => dept.name
             ),
         },
     ])
     .then((response) => {
         const deptList = res.find(
-            (deptList) => deptList.name === response.deptList
+            (dept) => dept.name === response.deptList
         );
-        connectDB.query(`INSERT INTO role (title, salary, department_id)
-        VALUES('${response.newRole}', '${response.salary}', '${response.deptList}')`,
+        employeeTracker_db.query(`INSERT INTO role (title, salary, department_id)
+        VALUES('${response.newRole}', '${response.salary}', '${dept.id}')`,
         (err, res) => {
             if (err) throw err;
             console.log('New role created!');
             question();
         });
     });
+});
 }
 
 const addEmployee = () => {
     // retrieve roles form the database
-    connectDB.query('SELECT id, title FROM roles', (err, res) => {
+    employeeTracker_db.query('SELECT id, title FROM roles', (err, resRoles) => {
         if (err) throw err;  
-         
-    const roles = results.map(({id, titile}) => ({
+    employeeTracker_db.query(
+        'SELECT id, CONCAT(first_name, " ",last_name) AS name FROM employee',
+        (err, resEmployee) => {
+            if (err) throw err;
+        });
+
+    const roles = resRoles.map(({id, titile}) => ({
         name: titile,
         value: id,
     }));
 
     //retrieve employees from the database to update as managers
-   connectDB.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee',(err,res) => {
+    employeeTracker_db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee',(err,resEmployee) => {
     if(err) throw err;
    
-    const managers = results.map(({ id, name}) => ({
+    const managers = resEmployee.map(({ id, name}) => ({
        name,
        value: id,
     }));
 
-    })
+    });
     inquirer 
     .prompt ([
         {
@@ -197,27 +202,32 @@ const addEmployee = () => {
     ])
     .then ((response) => {
         const sql = 
-        "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES ()";
+        "INSERT INTO employee (first_name, last_name, role_id, manager_id) VALUES (?, ?, ?, ?)";
         const values = [
             response.firstName,
             response.lastName,
             response.roleId,
             response.managerId,
         ];
-        connectDBquery(sql, values, (err) => {
+        employeeTracker_db.query(sql, values, (err) => {
             if (err) throw err;
         
         console.log("Employee added!");
+        question();
     });
     })
         .catch ((err) => {
-        console.log(error);
+        console.log(err);
     });
     
-})
-}
+});
+};
 
 const updateEmployee = () => {
+    employeeTracker_db.query('SELECT * FROM employee', (err, resEmployee) => {
+        if (err) throw err;
+        employeeTracker_db
+    })
     inquirer
     .prompt ([
         {
@@ -225,7 +235,7 @@ const updateEmployee = () => {
             message: 'Which employee you want to update?',
             name: 'updateEmployee',
             choices: resEmployee.map (
-                (viewAllEmployees) => `${viewAllEmployees.firstName} ${viewAllEmployees.lastName}`
+                (employee) => `${employee.firstName} ${employee.lastName}`
             ),
         },
         {
@@ -236,7 +246,16 @@ const updateEmployee = () => {
         }
     ])
     .then((response) => {
-        connectDB.query(`UPDATE employee SET ('${response.updateEmployee}')
-        WHERE(${response.newRole})
-    })
-}
+        employeeTracker_db.query(`UPDATE employee SET  role_id = ? WHERE CONCAT(first_name, "  ", last_name) =?`,
+        [response.role, response.updateEmployee],
+        (err, res) => {
+            if (err) throw err;
+            console.log('Employee Updated!');
+            question();
+        }
+        );
+});
+};
+
+//call question function to start application
+question();
