@@ -5,7 +5,7 @@ const fs = require('fs');
 // const connection = mysql.createConnection({
 //   host: '127.0.0.1',
 //   user: 'root',
-//   database: 'employeeTracker_db',
+//   database: 'employee_tracker_db',
 //   password:'',
 // });
 

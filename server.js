@@ -3,11 +3,11 @@ const mysql = require('mysql2');
 const cTable = require('console.table');
 
 // connect to datbase
-const employeeTracker_db = mysql.createConnection(
+const employee_tracker_db = mysql.createConnection(
     {
         host:'127.0.0.1',
         user:'root',
-        database:'employeeTracker_db',
+        database:'employee_tracker_db',
         password: '',
     },
     // console.log('Connected to database')
@@ -63,24 +63,24 @@ const question = () => {
  })
 }
 const viewAllDepartments = () => {
-    employeeTracker_db.query('SELECT * FROM departments', (err,res) => {
+    employee_tracker_db.query('SELECT * FROM departments', (err,res) => {
         if (err) throw err;
-        console.table
-        (res); //shows department table from db ie employee_db
+        console.table(res); //shows department table from db ie employee_db
         question();
     });
 };
 
 const viewAllEmployees = () => {
-    employeeTracker_db.query('SELECT * FROM employees', (err,res) => {
+    employee_tracker_db.query('SELECT * FROM employees', (err,res) => {
         if (err) throw err;
+        
         console.table(res); //shows all employees from table employee_db
         question();
     });
 };
 
 const viewAllRoles = () => {
-    employeeTracker_db.query('SELECT * FROM roles', (err,res) => {
+    employee_tracker_db.query('SELECT * FROM roles', (err,res) => {
         if (err) throw err;
         console.table(res); //shows all roles table from db ie employee_db
         question();
@@ -97,8 +97,9 @@ const addDepartment = () => {
         },
     ])
     .then((response) => {
-        employeeTracker_db.query(`INSERT INTO departments (name)
-        VALUES('${response.newDepartment}')`,
+        employee_tracker_db.query(
+            `INSERT INTO departments (name) VALUES(?)`,
+            [response.newDepartment],
         (err,  res) => {
             if(err) throw err;
             console.log('New department created!');
@@ -108,7 +109,7 @@ const addDepartment = () => {
 }
 
 const addRole = () => {
-    employeeTracker_db.query ("SELECT * FROM departments", (err, res) => {
+    employee_tracker_db.query ("SELECT * FROM departments", (err, res) => {
         if (err) throw err;
 
     inquirer 
@@ -140,7 +141,7 @@ const addRole = () => {
         },
     ])
     .then((response) => {
-        employeeTracker_db.query(`INSERT INTO role (title, salary, department_id)
+        employee_tracker_db.query(`INSERT INTO role (title, salary, department_id)
         VALUES('${response.newRole}', '${response.salary}', '${response.deptList}')`,
         (err, res) => {
             if (err) throw err;
@@ -153,9 +154,9 @@ const addRole = () => {
 
 const addEmployee = () => {
     // retrieve roles form the database
-    employeeTracker_db.query('SELECT id, title FROM roles', (err, resRoles) => {
+    employee_tracker_db.query('SELECT id, title FROM roles', (err, resRoles) => {
         if (err) throw err;  
-    employeeTracker_db.query(
+    employee_tracker_db.query(
         'SELECT id, CONCAT(first_name, " ",last_name) AS name FROM employee',
         (err, resEmployee) => {
             if (err) throw err;
@@ -167,7 +168,7 @@ const addEmployee = () => {
     }));
 
     //retrieve employees from the database to update as managers
-    employeeTracker_db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee',(err,resEmployee) => {
+    employee_tracker_db.query('SELECT id, CONCAT(first_name, " ", last_name) AS name FROM employee',(err,resEmployee) => {
     if(err) throw err;
    
     const managers = resEmployee.map(({ id, name}) => ({
@@ -213,7 +214,7 @@ const addEmployee = () => {
             response.roleId,
             response.managerId,
         ];
-        employeeTracker_db.query(sql, values, (err) => {
+        employee_tracker_db.query(sql, values, (err) => {
             if (err) throw err;
         
         console.log("Employee added!");
@@ -228,9 +229,9 @@ const addEmployee = () => {
 };
 
 const updateEmployee = () => {
-    employeeTracker_db.query('SELECT * FROM employee', (err, resEmployee) => {
+    employee_tracker_db.query('SELECT * FROM employee', (err, resEmployee) => {
         if (err) throw err;
-        employeeTracker_db
+        employee_tracker_db
     })
     inquirer
     .prompt ([
@@ -250,7 +251,7 @@ const updateEmployee = () => {
         }
     ])
     .then((response) => {
-        employeeTracker_db.query(`UPDATE employee SET  role_id = ? WHERE CONCAT(first_name, "  ", last_name) =?`,
+        employee_tracker_db.query(`UPDATE employee SET  role_id = ? WHERE CONCAT(first_name, "  ", last_name) =?`,
         [response.role, response.updateEmployee],
         (err, res) => {
             if (err) throw err;

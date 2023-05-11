@@ -1,4 +1,6 @@
-INSERT INTO departments (department_name)
+USE employee_tracker_db;
+
+INSERT INTO departments (name)
 VALUES
 ('Engineer'),
 ('Human Resources'),
@@ -22,13 +24,13 @@ VALUES
 
 INSERT INTO employees (first_name, last_name, role_id, manager_id)
 VALUES
-('Sophia', 'Tunner', 1 , 1),
-('Tom', 'Cruz', 2,2),
-('Jason','Durro', 3,3),
-('Charls','Mcd', 4,4),
-('James', 'Bond', 5,5),
-('Mary','Jane',6,6),
-('Santa', 'Cruz', 7 ,7),
-('Charls','TheFirst', 8,8),
-('Ninja', 'Tech', 9,9),
-('Base','Nector', 10,10);
+('Sophia', 'Tunner', 1 , NULL),
+('Tom', 'Cruz', 2,1),
+('Jason','Durro', 3,1),
+('Charls','Mcd', 4,2),
+('James', 'Bond', 5,1),
+('Mary','Jane',6,3),
+('Santa', 'Cruz', 7 ,2),
+('Charls','TheFirst', 8,2),
+('Ninja', 'Tech', 5,1),
+('Base','Nector', 1,2);
